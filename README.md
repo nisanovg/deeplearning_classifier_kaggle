@@ -23,42 +23,39 @@ Fashion‑MNIST Classifier
 - 8 — Bag (сумка)
 - 9 — Ankle boot (сапог)
 
-
 Каждое изображение хранится в виде 784 пикселей (28×28), значения от 0 до 255 в чёрно-белой шкале.
+
+## Задача
+1. Провести первичный анализ (EDA), проверить данные на наличие NaN.  
+2. Построить классификатор и получить предсказания для тестовой выборки.  
+3. Отправить решение в формате `sample_submission.csv`.
 
 ## Критерии успеха
 - Метрика: **accuracy**.  
-- Решение зачтётся, если **Public Leaderboard ≥ 0.85**.  
-- Минимальное требование для зачёта — **accuracy ≥ 0.80**.  
-- В день допускается не более **20 отправок**.
+- Public Leaderboard ≥ 0.85 для зачёта; минимум 0.80.  
+- Не более 20 отправок в день.
 
 ## Выбранный способ реализации
 - **Среда и библиотеки**  
-  - Python 3.8+  
-  - TensorFlow 2.x (Keras API), NumPy, Pandas, Matplotlib  
-- **Предобработка данных**  
-  1. Загрузка CSV, извлечение меток и пикселей.  
-  2. Нормализация пикселей: `X / 255.0`.  
-  3. Преобразование в формат `(-1, 28, 28, 1)`.  
+  Python 3.8+, TensorFlow 2.x (Keras), NumPy, Pandas, Matplotlib, scikit-learn.  
+- **Предобработка**  
+  1. Загрузка CSV, удаление строк с NaN.  
+  2. Нормализация пикселей: `X = X / 255.0`.  
+  3. reshape `(-1, 28, 28, 1)`.  
   4. One-hot кодирование меток через `to_categorical`.  
-  5. Разбиение на обучение и валидацию: `train_test_split(test_size=0.2, random_state=42, stratify=y)`.  
+  5. Разбиение на обучение и валидацию (80/20) с `train_test_split(stratify=y)`.  
 - **Архитектура модели**  
-  Построена как `Sequential`:
-  1. `Conv2D(32, 3×3, activation='relu', padding='same', input_shape=(28,28,1))`  
-     + `MaxPooling2D(2×2)` + `Dropout(0.25)`  
-  2. `Conv2D(64, 3×3, activation='relu', padding='same')`  
-     + `MaxPooling2D(2×2)` + `Dropout(0.25)`  
-  3. `Conv2D(128, 3×3, activation='relu', padding='same')`  
-     + `MaxPooling2D(2×2)` + `Dropout(0.30)`  
-  4. `Flatten()`  
-  5. `Dense(128, activation='relu')` + `Dropout(0.50)`  
-  6. `Dense(10, activation='softmax')`
-     
+  1. Conv2D(32, 3×3, ReLU, padding=‘same’) → MaxPooling2D(2×2) → Dropout(0.25)  
+  2. Conv2D(64, 3×3, ReLU, padding=‘same’) → MaxPooling2D(2×2) → Dropout(0.25)  
+  3. Conv2D(128, 3×3, ReLU, padding=‘same’) → MaxPooling2D(2×2) → Dropout(0.30)  
+  4. Flatten → Dense(128, ReLU) → Dropout(0.50) → Dense(10, softmax)  
+- **Обучение**  
+  - Optimizer: `SGD(lr=0.001, momentum=0.9, clipnorm=1.0)`  
+  - Loss: `categorical_crossentropy`, метрика `accuracy`  
+  - Batch size = 64, epochs ≤ 300  
+  - Callback: `EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)`  
 - **Результат**  
-  - Достигнута точность **0.90** на Public Leaderboard.
-
-## Результаты
-- Моя модель достигла **accuracy = 0.90** на Public Leaderboard.
+  Модель достигла **0.90** accuracy на Public Leaderboard.
 
 
 ## Лицензия
