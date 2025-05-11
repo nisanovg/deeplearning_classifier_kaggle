@@ -26,19 +26,40 @@ Fashion‑MNIST Classifier
 
 Каждое изображение хранится в виде 784 пикселей (28×28), значения от 0 до 255 в чёрно-белой шкале.
 
-## Задача
-1. Провести первичный анализ (EDA), проверить данные на наличие пропусков (NaN).
-2. Построить классификатор, который выдаёт предсказания для тестовой выборки.
-3. Отправить решение в формате `sample_submission.csv`.
-
 ## Критерии успеха
-- Метрика: **accuracy**.
-- Решение считается «пройденным», если **Public Leaderboard ≥ 0.85**.
-- Минимальное требование для зачёта — **accuracy ≥ 0.80**.
+- Метрика: **accuracy**.  
+- Решение зачтётся, если **Public Leaderboard ≥ 0.85**.  
+- Минимальное требование для зачёта — **accuracy ≥ 0.80**.  
 - В день допускается не более **20 отправок**.
+
+## Выбранный способ реализации
+- **Среда и библиотеки**  
+  - Python 3.8+  
+  - TensorFlow 2.x (Keras API), NumPy, Pandas, Matplotlib  
+- **Предобработка данных**  
+  1. Загрузка CSV, извлечение меток и пикселей.  
+  2. Нормализация пикселей: `X / 255.0`.  
+  3. Преобразование в формат `(-1, 28, 28, 1)`.  
+  4. One-hot кодирование меток через `to_categorical`.  
+  5. Разбиение на обучение и валидацию: `train_test_split(test_size=0.2, random_state=42, stratify=y)`.  
+- **Архитектура модели**  
+  Построена как `Sequential`:
+  1. `Conv2D(32, 3×3, activation='relu', padding='same', input_shape=(28,28,1))`  
+     + `MaxPooling2D(2×2)` + `Dropout(0.25)`  
+  2. `Conv2D(64, 3×3, activation='relu', padding='same')`  
+     + `MaxPooling2D(2×2)` + `Dropout(0.25)`  
+  3. `Conv2D(128, 3×3, activation='relu', padding='same')`  
+     + `MaxPooling2D(2×2)` + `Dropout(0.30)`  
+  4. `Flatten()`  
+  5. `Dense(128, activation='relu')` + `Dropout(0.50)`  
+  6. `Dense(10, activation='softmax')`
+     
+- **Результат**  
+  - Достигнута точность **0.90** на Public Leaderboard.
 
 ## Результаты
 - Моя модель достигла **accuracy = 0.90** на Public Leaderboard.
+
 
 ## Лицензия
 MIT
